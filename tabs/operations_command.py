@@ -284,12 +284,23 @@ def render_operations_command():
         st.markdown(f'<div class="metric-card"><div style="color:#888;">Grounded</div><div class="metric-value status-grounded">{grounded_count}</div></div>', unsafe_allow_html=True)
 
     # Fleet Matrix Layout
-    col1, col2 = st.columns([4, 1])
+    col1, col2, col3 = st.columns([3, 1, 1])
     with col1:
         st.markdown("### Fleet Matrix")
     with col2:
         if st.button("➕ Add Vehicle", use_container_width=True):
             add_vehicle_dialog()
+    with col3:
+        if fleet_view_data:
+            df = pd.DataFrame(fleet_view_data)
+            csv = df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="📥 Export CSV",
+                data=csv,
+                file_name="fleet_status_report.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
     
     cols = st.columns(4)
     for idx, v in enumerate(fleet_view_data):
