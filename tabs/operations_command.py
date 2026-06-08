@@ -2,6 +2,45 @@ import streamlit as st
 import pandas as pd
 from backend import get_supabase
 
+@st.dialog("➕ Add New Vehicle", width="large")
+def add_vehicle_dialog():
+    st.write("Register a new van to the fleet.")
+    with st.form("add_vehicle_form"):
+        van_id = st.text_input("Van ID (e.g., Van 45)")
+        vin = st.text_input("VIN (Optional)")
+        make_model = st.selectbox("Make/Model", options=["Ford", "Ram"])
+        initial_mileage = st.number_input("Initial Mileage", min_value=0, step=1)
+        
+        submitted = st.form_submit_button("Register Vehicle", type="primary")
+        if submitted:
+            if not van_id.strip():
+                st.error("Van ID is required.")
+                return
+            
+            supabase = get_supabase()
+            try:
+                # Check if exists
+                res = supabase.table("vehicles").select("van_id").eq("van_id", van_id.strip()).execute()
+                if res.data:
+                    st.error("A vehicle with this Van ID already exists.")
+                    return
+                
+                # Insert
+                new_vehicle = {
+                    "van_id": van_id.strip(),
+                    "vin": vin.strip() if vin.strip() else None,
+                    "make_model": make_model,
+                    "last_mileage": initial_mileage,
+                    "last_oil_change_mileage": initial_mileage,
+                    "last_tire_rotation_mileage": initial_mileage,
+                    "status": "Active"
+                }
+                supabase.table("vehicles").insert(new_vehicle).execute()
+                st.success(f"{van_id} registered successfully!")
+                st.rerun()
+            except Exception as e:
+                st.error(f"Failed to register vehicle: {e}")
+
 @st.dialog("Van Profile Manager", width="large")
 def manage_van_dialog(selected_van, vehicles):
     supabase = get_supabase()
@@ -245,7 +284,12 @@ def render_operations_command():
         st.markdown(f'<div class="metric-card"><div style="color:#888;">Grounded</div><div class="metric-value status-grounded">{grounded_count}</div></div>', unsafe_allow_html=True)
 
     # Fleet Matrix Layout
-    st.markdown("### Fleet Matrix")
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        st.markdown("### Fleet Matrix")
+    with col2:
+        if st.button("➕ Add Vehicle", use_container_width=True):
+            add_vehicle_dialog()
     
     cols = st.columns(4)
     for idx, v in enumerate(fleet_view_data):
