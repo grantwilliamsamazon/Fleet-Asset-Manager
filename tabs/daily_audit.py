@@ -131,8 +131,6 @@ def render_daily_audit():
                 update_data = {
                     "last_mileage": current_mileage
                 }
-                if is_grounding_risk:
-                    update_data["status"] = "Grounded"
                     
                 supabase.table("vehicles").update(update_data).eq("van_id", selected_van).execute()
                 
