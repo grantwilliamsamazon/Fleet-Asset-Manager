@@ -179,6 +179,16 @@ def render_operations_command():
         st.info("No vehicles found.")
         return
 
+    # Fetch maintenance intervals
+    try:
+        settings_res = supabase.table("settings").select("value").eq("key", "maintenance_intervals").execute()
+        if settings_res.data:
+            maintenance_intervals = settings_res.data[0]["value"]
+        else:
+            maintenance_intervals = {"Ford": {"oil": 5000, "tire": 10000}, "Ram": {"oil": 5000, "tire": 10000}}
+    except Exception as e:
+        maintenance_intervals = {"Ford": {"oil": 5000, "tire": 10000}, "Ram": {"oil": 5000, "tire": 10000}}
+
     # Process KPIs & Alerts
     active_count = 0
     maintenance_count = 0
@@ -189,15 +199,21 @@ def render_operations_command():
     for v in vehicles:
         van_id = v['van_id']
         status = v['status']
+        make_model = v.get('make_model', '')
         last_mileage = v.get('last_mileage', 0) or 0
         last_oil = v.get('last_oil_change_mileage', 0) or 0
         last_tire = v.get('last_tire_rotation_mileage', 0) or 0
         
+        # Determine specific intervals
+        intervals = maintenance_intervals.get(make_model, {"oil": 5000, "tire": 10000})
+        oil_interval = intervals.get("oil", 5000)
+        tire_interval = intervals.get("tire", 10000)
+        
         alerts = []
         # Smart maintenance alerts
-        if (last_mileage - last_oil) >= 5000:
+        if (last_mileage - last_oil) >= oil_interval:
             alerts.append("Oil Change Due")
-        if (last_mileage - last_tire) >= 10000:
+        if (last_mileage - last_tire) >= tire_interval:
             alerts.append("Tire Rotation Due")
             
         display_status = status

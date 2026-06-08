@@ -3,6 +3,7 @@ from backend import get_supabase
 from tabs.daily_audit import render_daily_audit
 from tabs.operations_command import render_operations_command
 from tabs.log_maintenance import render_log_maintenance
+from tabs.settings import render_settings
 
 # Configure Streamlit page
 st.set_page_config(
@@ -77,7 +78,7 @@ st.title("🚚 DSP Fleet Asset Manager")
 st.markdown("### Welcome Shrimp 🦐")
 
 # Create tabs
-tab1, tab2, tab3 = st.tabs(["📝 Audit", "📊 Operations Command", "🛠️ Log Maintenance"])
+tab1, tab2, tab3, tab4 = st.tabs(["📝 Audit", "📊 Operations Command", "🛠️ Log Maintenance", "⚙️ Settings"])
 
 with tab1:
     render_daily_audit()
@@ -87,3 +88,6 @@ with tab2:
 
 with tab3:
     render_log_maintenance()
+
+with tab4:
+    render_settings()
