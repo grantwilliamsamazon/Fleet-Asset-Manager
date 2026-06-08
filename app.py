@@ -12,6 +12,25 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# Authentication block
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    st.markdown("<h2 style='text-align: center; margin-top: 50px;'>Login Required</h2>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        with st.form("login_form"):
+            pwd = st.text_input("Enter Passcode", type="password")
+            submitted = st.form_submit_button("Login", use_container_width=True)
+            if submitted:
+                if pwd == "111020":
+                    st.session_state.authenticated = True
+                    st.rerun()
+                else:
+                    st.error("Incorrect passcode")
+    st.stop() # Stops execution of the rest of the app until authenticated
+
 # Render Custom CSS for aesthetics
 st.markdown("""
 <style>
@@ -55,6 +74,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("🚚 DSP Fleet Asset Manager")
+st.markdown("### Welcome Shrimp 🦐")
 
 # Create tabs
 tab1, tab2, tab3 = st.tabs(["📝 Audit", "📊 Operations Command", "🛠️ Log Maintenance"])
