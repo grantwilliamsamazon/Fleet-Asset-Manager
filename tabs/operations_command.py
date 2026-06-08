@@ -61,7 +61,7 @@ def manage_van_dialog(selected_van, vehicles):
                 audit_id = a.get('id')
                 date_str = a.get('audit_date', '')[:10]
                 with st.expander(f"Audit on {date_str} - Mileage: {a.get('mileage', 0)}"):
-                    st.write(f"**Treads (mm):** FL: {a.get('tread_fl')} | FR: {a.get('tread_fr')} | RL: {a.get('tread_rl')} | RR: {a.get('tread_rr')}")
+                    st.write(f"**Treads (mm):** Front Driver Side Tire: {a.get('tread_fl')} | Front Passenger Side Tire: {a.get('tread_fr')} | Rear Driver Side Tire: {a.get('tread_rl')} | Rear Passenger Side Tire: {a.get('tread_rr')}")
                     st.write(f"**Fluids:** Wiper: {a.get('fluid_wiper')} | Coolant: {a.get('fluid_coolant')} | Oil: {a.get('fluid_oil')}")
                     if a.get('damage_notes'):
                         st.write(f"**Damage Notes:** {a.get('damage_notes')}")
@@ -101,10 +101,10 @@ def manage_van_dialog(selected_van, vehicles):
                             e_mil = st.number_input("Mileage", value=a.get('mileage',0), step=1)
                             
                             c1, c2 = st.columns(2)
-                            e_fl = c1.slider("Tread FL", 0.0, 12.0, float(a.get('tread_fl', 8.0)), key=f"efl_{audit_id}")
-                            e_fr = c2.slider("Tread FR", 0.0, 12.0, float(a.get('tread_fr', 8.0)), key=f"efr_{audit_id}")
-                            e_rl = c1.slider("Tread RL", 0.0, 12.0, float(a.get('tread_rl', 8.0)), key=f"erl_{audit_id}")
-                            e_rr = c2.slider("Tread RR", 0.0, 12.0, float(a.get('tread_rr', 8.0)), key=f"err_{audit_id}")
+                            e_fl = c1.slider("Front Driver Side Tire", 0.0, 12.0, float(a.get('tread_fl', 8.0)), key=f"efl_{audit_id}")
+                            e_fr = c2.slider("Front Passenger Side Tire", 0.0, 12.0, float(a.get('tread_fr', 8.0)), key=f"efr_{audit_id}")
+                            e_rl = c1.slider("Rear Driver Side Tire", 0.0, 12.0, float(a.get('tread_rl', 8.0)), key=f"erl_{audit_id}")
+                            e_rr = c2.slider("Rear Passenger Side Tire", 0.0, 12.0, float(a.get('tread_rr', 8.0)), key=f"err_{audit_id}")
                             
                             c3, c4, c5 = st.columns(3)
                             wiper_val = a.get('fluid_wiper', 'Good')

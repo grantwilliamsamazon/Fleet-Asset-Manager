@@ -3,7 +3,7 @@ import time
 from backend import get_supabase, compress_image, upload_photo
 
 def render_daily_audit():
-    st.header("Daily Pad Audit")
+    st.header("Audit")
     st.markdown("Perform mobile-optimized daily checks on physical assets.")
     
     supabase = get_supabase()
@@ -35,11 +35,11 @@ def render_daily_audit():
     st.markdown("### Tire Tread Matrix (mm)")
     col1, col2 = st.columns(2)
     with col1:
-        tread_fl = st.slider("Front Left", 0.0, 12.0, 8.0, 0.1, key="audit_tread_fl")
-        tread_rl = st.slider("Rear Left", 0.0, 12.0, 8.0, 0.1, key="audit_tread_rl")
+        tread_fl = st.slider("Front Driver Side Tire", 0.0, 12.0, 8.0, 0.1, key="audit_tread_fl")
+        tread_rl = st.slider("Rear Driver Side Tire", 0.0, 12.0, 8.0, 0.1, key="audit_tread_rl")
     with col2:
-        tread_fr = st.slider("Front Right", 0.0, 12.0, 8.0, 0.1, key="audit_tread_fr")
-        tread_rr = st.slider("Rear Right", 0.0, 12.0, 8.0, 0.1, key="audit_tread_rr")
+        tread_fr = st.slider("Front Passenger Side Tire", 0.0, 12.0, 8.0, 0.1, key="audit_tread_fr")
+        tread_rr = st.slider("Rear Passenger Side Tire", 0.0, 12.0, 8.0, 0.1, key="audit_tread_rr")
         
     st.markdown("### Fluids Panel")
     col3, col4, col5 = st.columns(3)

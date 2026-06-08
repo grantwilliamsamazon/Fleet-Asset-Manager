@@ -57,7 +57,7 @@ st.markdown("""
 st.title("🚚 DSP Fleet Asset Manager")
 
 # Create tabs
-tab1, tab2, tab3 = st.tabs(["📋 Daily Pad Audit", "📊 Operations Command", "🛠️ Log Maintenance"])
+tab1, tab2, tab3 = st.tabs(["📝 Audit", "📊 Operations Command", "🛠️ Log Maintenance"])
 
 with tab1:
     render_daily_audit()
