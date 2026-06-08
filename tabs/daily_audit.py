@@ -58,8 +58,8 @@ def render_daily_audit():
     photo_labels = [
         "Front", "Rear",
         "Driver Side", "Passenger Side",
-        "Rear Driver Side", "Rear Passenger Side",
-        "Front Passenger Side", "Front Driver Side"
+        "Rear Driver Side Tire", "Rear Passenger Side Tire",
+        "Front Passenger Side Tire", "Front Driver Side Tire"
     ]
     
     current_idx = len(st.session_state.audit_photos)

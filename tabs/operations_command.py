@@ -52,8 +52,8 @@ def manage_van_dialog(selected_van, vehicles):
             photo_labels = [
                 "Front", "Rear",
                 "Driver Side", "Passenger Side",
-                "Rear Driver Side", "Rear Passenger Side",
-                "Front Passenger Side", "Front Driver Side"
+                "Rear Driver Side Tire", "Rear Passenger Side Tire",
+                "Front Passenger Side Tire", "Front Driver Side Tire"
             ]
             
             st.write(f"Showing recent audits for **{selected_van}**:")
