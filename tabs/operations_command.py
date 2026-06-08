@@ -10,8 +10,7 @@ def manage_van_dialog(selected_van, vehicles):
     if not van_record:
         st.error("Van record not found.")
         return
-        
-    tab1, tab2 = st.tabs(["Vehicle Info", "Audit Logs"])
+    tab1, tab2, tab3 = st.tabs(["Vehicle Info", "Audit Logs", "Maintenance Logs"])
     
     with tab1:
         st.subheader("Edit Vehicle Details")
@@ -132,6 +131,37 @@ def manage_van_dialog(selected_van, vehicles):
                                     st.error(f"Update failed: {e}")
         else:
             st.info("No historical audits found for this van.")
+            
+    with tab3:
+        try:
+            maint_res = supabase.table("maintenance_events").select("*").eq("van_id", selected_van).order("event_date", desc=True).limit(20).execute()
+            maintenance_events = maint_res.data
+        except Exception as e:
+            st.error(f"Failed to load maintenance logs: {e}")
+            maintenance_events = []
+            
+        if maintenance_events:
+            st.write(f"Showing recent maintenance for **{selected_van}**:")
+            for m in maintenance_events:
+                event_id = m.get('id')
+                date_str = m.get('event_date', '')
+                e_type = m.get('event_type', 'Service')
+                with st.expander(f"{date_str} - {e_type} @ {m.get('mileage_at_service', 0)} miles"):
+                    if m.get('service_notes'):
+                        st.write(f"**Notes:** {m.get('service_notes')}")
+                    else:
+                        st.write("No notes provided.")
+                        
+                    st.markdown("---")
+                    if st.button("🗑️ Delete Log", key=f"del_maint_{event_id}", type="secondary"):
+                        try:
+                            supabase.table("maintenance_events").delete().eq("id", event_id).execute()
+                            st.success("Maintenance log deleted!")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Delete failed: {e}")
+        else:
+            st.info("No maintenance logs found for this van.")
 
 def render_operations_command():
     st.header("Operations Command")
