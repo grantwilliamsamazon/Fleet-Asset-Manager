@@ -63,20 +63,25 @@ def manage_van_dialog(selected_van, vehicles):
                 status_opts.append(current_status)
                 
             new_status = st.selectbox("Status", options=status_opts, index=status_opts.index(current_status))
+            new_notes = st.text_area("Status Notes (Required if Grounding)", value=van_record.get('status_notes') or "")
             new_mileage = st.number_input("Last Mileage", value=van_record.get('last_mileage', 0), step=1)
             
             if st.form_submit_button("Save Vehicle Info", type="primary"):
-                try:
-                    supabase.table("vehicles").update({
-                        "vin": new_vin,
-                        "make_model": new_make,
-                        "status": new_status,
-                        "last_mileage": new_mileage
-                    }).eq("van_id", selected_van).execute()
-                    st.success("Vehicle info updated!")
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Failed to update vehicle: {e}")
+                if new_status == "Grounded" and not new_notes.strip():
+                    st.error("Please provide a reason for grounding in the Status Notes field.")
+                else:
+                    try:
+                        supabase.table("vehicles").update({
+                            "vin": new_vin,
+                            "make_model": new_make,
+                            "status": new_status,
+                            "status_notes": new_notes.strip() if new_notes.strip() else None,
+                            "last_mileage": new_mileage
+                        }).eq("van_id", selected_van).execute()
+                        st.success("Vehicle info updated!")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Failed to update vehicle: {e}")
                     
     with tab2:
         try:
@@ -270,7 +275,8 @@ def render_operations_command():
             "VIN": v.get('vin', 'N/A'),
             "Status": display_status,
             "Mileage": last_mileage,
-            "Alerts": ", ".join(alerts) if alerts else ""
+            "Alerts": ", ".join(alerts) if alerts else "",
+            "Status Notes": v.get('status_notes') or ""
         })
 
     # KPI Status Summary
@@ -306,6 +312,7 @@ def render_operations_command():
     for idx, v in enumerate(fleet_view_data):
         col = cols[idx % 4]
         with col:
+            status_notes_html = f'<p style="margin: 5px 0 0 0; font-size: 0.85em; color: #f87171;"><strong>Reason:</strong> {v["Status Notes"]}</p>' if v["Status Notes"] and v["Status"] == "Grounded" else ''
             alerts_html = f'<p style="margin: 0; font-size: 0.85em; color: #fbbf24;">{v["Alerts"]}</p>' if v["Alerts"] else ''
             st.markdown(f'''
             <div class="van-card {v["Status"]}">
@@ -313,7 +320,8 @@ def render_operations_command():
                 <p style="margin: 0; font-size: 0.9em; color: #aaa;">{v["Make/Model"]}</p>
                 <p style="margin: 0; font-size: 0.85em; color: #888;">VIN: {v["VIN"]}</p>
                 <p style="margin: 5px 0 0 0;"><strong>{v["Status"]}</strong></p>
-                <p style="margin: 0; font-size: 0.85em;">Mileage: {v["Mileage"]}</p>
+                {status_notes_html}
+                <p style="margin: 5px 0 0 0; font-size: 0.85em;">Mileage: {v["Mileage"]}</p>
                 {alerts_html}
             </div>
             ''', unsafe_allow_html=True)
