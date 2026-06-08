@@ -55,8 +55,18 @@ def render_daily_audit():
     st.markdown("### 📷 Live Camera Capture")
     st.caption(f"Photos captured: {len(st.session_state.audit_photos)} / 8")
     
-    if len(st.session_state.audit_photos) < 8:
-        pic = st.camera_input("Take Photo", key=f"camera_{len(st.session_state.audit_photos)}")
+    photo_labels = [
+        "Front", "Rear",
+        "Driver Side", "Passenger Side",
+        "Rear Driver Side", "Rear Passenger Side",
+        "Front Passenger Side", "Front Driver Side"
+    ]
+    
+    current_idx = len(st.session_state.audit_photos)
+    if current_idx < 8:
+        current_label = photo_labels[current_idx]
+        st.markdown(f"**Next Required Photo: {current_label}**")
+        pic = st.camera_input(f"Snap {current_label}", key=f"camera_{current_idx}")
         if pic:
             st.session_state.audit_photos.append(pic)
             st.rerun()
@@ -65,7 +75,7 @@ def render_daily_audit():
         st.markdown("**Captured Photos**")
         p_cols = st.columns(4)
         for i, p in enumerate(st.session_state.audit_photos):
-            p_cols[i % 4].image(p, use_column_width=True)
+            p_cols[i % 4].image(p, caption=photo_labels[i], use_column_width=True)
             
         if st.button("❌ Clear Photos", use_container_width=True):
             st.session_state.audit_photos = []
