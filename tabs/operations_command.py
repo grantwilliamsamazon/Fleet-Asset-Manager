@@ -314,16 +314,14 @@ def render_operations_command():
         with col:
             status_notes_html = f'<p style="margin: 5px 0 0 0; font-size: 0.85em; color: #f87171;"><strong>Reason:</strong> {v["Status Notes"]}</p>' if v["Status Notes"] and v["Status"] == "Grounded" else ''
             alerts_html = f'<p style="margin: 0; font-size: 0.85em; color: #fbbf24;">{v["Alerts"]}</p>' if v["Alerts"] else ''
-            st.markdown(f'''
-            <div class="van-card {v["Status"]}">
-                <h4>{v["Van ID"]}</h4>
-                <p style="margin: 0; font-size: 0.9em; color: #aaa;">{v["Make/Model"]}</p>
-                <p style="margin: 0; font-size: 0.85em; color: #888;">VIN: {v["VIN"]}</p>
-                <p style="margin: 5px 0 0 0;"><strong>{v["Status"]}</strong></p>
-                {status_notes_html}
-                <p style="margin: 5px 0 0 0; font-size: 0.85em;">Mileage: {v["Mileage"]}</p>
-                {alerts_html}
-            </div>
-            ''', unsafe_allow_html=True)
+            st.markdown(f'''<div class="van-card {v["Status"]}">
+<h4 style="margin-top: 0;">{v["Van ID"]}</h4>
+<p style="margin: 0; font-size: 0.9em; color: #aaa;">{v["Make/Model"]}</p>
+<p style="margin: 0; font-size: 0.85em; color: #888;">VIN: {v["VIN"]}</p>
+<p style="margin: 5px 0 0 0;"><strong>{v["Status"]}</strong></p>
+{status_notes_html}
+<p style="margin: 5px 0 0 0; font-size: 0.85em;">Mileage: {v["Mileage"]}</p>
+{alerts_html}
+</div>''', unsafe_allow_html=True)
             if st.button("Manage Van Data & Logs", key=f"btn_{v['Van ID']}", use_container_width=True):
                 manage_van_dialog(v["Van ID"], vehicles)
