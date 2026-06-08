@@ -2,6 +2,13 @@ import streamlit as st
 import time
 from backend import get_supabase, compress_image, upload_photo
 
+def sync_tread(pos, source):
+    val = st.session_state[f"audit_{source}_{pos}"]
+    if source == 'slider':
+        st.session_state[f"audit_num_{pos}"] = val
+    else:
+        st.session_state[f"audit_slider_{pos}"] = val
+
 def render_daily_audit():
     st.header("Audit")
     st.markdown("Perform mobile-optimized daily checks on physical assets.")
@@ -24,6 +31,13 @@ def render_daily_audit():
     
     if "audit_photos" not in st.session_state:
         st.session_state.audit_photos = []
+        
+    # Initialize tread states
+    for pos in ['fl', 'fr', 'rl', 'rr']:
+        if f"audit_slider_{pos}" not in st.session_state:
+            st.session_state[f"audit_slider_{pos}"] = 8.0
+        if f"audit_num_{pos}" not in st.session_state:
+            st.session_state[f"audit_num_{pos}"] = 8.0
 
     selected_van = st.selectbox("Select Van ID", options=list(van_options.keys()), key="audit_van_id")
     last_known_mileage = van_options.get(selected_van, 0)
@@ -34,12 +48,33 @@ def render_daily_audit():
     
     st.markdown("### Tire Tread Matrix (mm)")
     col1, col2 = st.columns(2)
+    
     with col1:
-        tread_fl = st.slider("Front Driver Side Tire", 0.0, 12.0, 8.0, 0.1, key="audit_tread_fl")
-        tread_rl = st.slider("Rear Driver Side Tire", 0.0, 12.0, 8.0, 0.1, key="audit_tread_rl")
+        st.markdown("**Front Driver Side Tire**")
+        sc1, nc1 = st.columns([3, 1])
+        sc1.slider("FL Slider", 0.0, 12.0, key="audit_slider_fl", on_change=sync_tread, args=("fl", "slider"), label_visibility="collapsed")
+        nc1.number_input("FL Num", 0.0, 12.0, key="audit_num_fl", on_change=sync_tread, args=("fl", "num"), label_visibility="collapsed")
+        
+        st.markdown("**Rear Driver Side Tire**")
+        sc2, nc2 = st.columns([3, 1])
+        sc2.slider("RL Slider", 0.0, 12.0, key="audit_slider_rl", on_change=sync_tread, args=("rl", "slider"), label_visibility="collapsed")
+        nc2.number_input("RL Num", 0.0, 12.0, key="audit_num_rl", on_change=sync_tread, args=("rl", "num"), label_visibility="collapsed")
+        
     with col2:
-        tread_fr = st.slider("Front Passenger Side Tire", 0.0, 12.0, 8.0, 0.1, key="audit_tread_fr")
-        tread_rr = st.slider("Rear Passenger Side Tire", 0.0, 12.0, 8.0, 0.1, key="audit_tread_rr")
+        st.markdown("**Front Passenger Side Tire**")
+        sc3, nc3 = st.columns([3, 1])
+        sc3.slider("FR Slider", 0.0, 12.0, key="audit_slider_fr", on_change=sync_tread, args=("fr", "slider"), label_visibility="collapsed")
+        nc3.number_input("FR Num", 0.0, 12.0, key="audit_num_fr", on_change=sync_tread, args=("fr", "num"), label_visibility="collapsed")
+        
+        st.markdown("**Rear Passenger Side Tire**")
+        sc4, nc4 = st.columns([3, 1])
+        sc4.slider("RR Slider", 0.0, 12.0, key="audit_slider_rr", on_change=sync_tread, args=("rr", "slider"), label_visibility="collapsed")
+        nc4.number_input("RR Num", 0.0, 12.0, key="audit_num_rr", on_change=sync_tread, args=("rr", "num"), label_visibility="collapsed")
+        
+    tread_fl = st.session_state.audit_num_fl
+    tread_fr = st.session_state.audit_num_fr
+    tread_rl = st.session_state.audit_num_rl
+    tread_rr = st.session_state.audit_num_rr
         
     st.markdown("### Fluids Panel")
     col3, col4, col5 = st.columns(3)
@@ -138,8 +173,12 @@ def render_daily_audit():
                 
                 # Clear all form state
                 keys_to_clear = [
-                    "audit_van_id", "audit_mileage", "audit_tread_fl", "audit_tread_rl",
-                    "audit_tread_fr", "audit_tread_rr", "audit_wiper", "audit_coolant",
+                    "audit_van_id", "audit_mileage", 
+                    "audit_slider_fl", "audit_num_fl",
+                    "audit_slider_fr", "audit_num_fr",
+                    "audit_slider_rl", "audit_num_rl",
+                    "audit_slider_rr", "audit_num_rr",
+                    "audit_wiper", "audit_coolant",
                     "audit_oil", "audit_damage", "audit_photos"
                 ]
                 for k in keys_to_clear:
