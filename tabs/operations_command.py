@@ -51,6 +51,7 @@ def render_operations_command():
         fleet_view_data.append({
             "Van ID": van_id,
             "Make/Model": v.get('make_model', ''),
+            "VIN": v.get('vin', 'N/A'),
             "Status": display_status,
             "Mileage": last_mileage,
             "Alerts": ", ".join(alerts) if alerts else "None"
@@ -77,15 +78,24 @@ def render_operations_command():
             <div class="van-card {v["Status"]}">
                 <h4>{v["Van ID"]}</h4>
                 <p style="margin: 0; font-size: 0.9em; color: #aaa;">{v["Make/Model"]}</p>
+                <p style="margin: 0; font-size: 0.85em; color: #888;">VIN: {v["VIN"]}</p>
                 <p style="margin: 5px 0 0 0;"><strong>{v["Status"]}</strong></p>
                 <p style="margin: 0; font-size: 0.85em;">Mileage: {v["Mileage"]}</p>
                 <p style="margin: 0; font-size: 0.85em; color: #fbbf24;">{v["Alerts"]}</p>
             </div>
             ''', unsafe_allow_html=True)
+            if st.button(f"Manage {v['Van ID']}", key=f"btn_{v['Van ID']}", use_container_width=True):
+                st.session_state.van_selector = v["Van ID"]
+                st.rerun()
 
     st.markdown("---")
     st.header("Van Dashboard")
-    selected_van = st.selectbox("Select Van to Manage", options=[v['Van ID'] for v in fleet_view_data])
+    
+    van_options_list = [v['Van ID'] for v in fleet_view_data]
+    if "van_selector" not in st.session_state:
+        st.session_state.van_selector = van_options_list[0] if van_options_list else None
+        
+    selected_van = st.selectbox("Select Van to Manage", options=van_options_list, key="van_selector")
     
     if selected_van:
         van_record = next((v for v in vehicles if v['van_id'] == selected_van), None)
