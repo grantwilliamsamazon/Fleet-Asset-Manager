@@ -51,7 +51,25 @@ def render_daily_audit():
         damage_notes = st.text_area("Damage Notes", placeholder="Enter any new physical damage...")
         
         st.markdown("### Multi-Media Uploader")
-        uploaded_files = st.file_uploader("Snap up to 8 core photos", accept_multiple_files=True, type=["jpg", "jpeg", "png", "heic"])
+        st.caption("Tap each slot to open your camera and snap the required photos.")
+        
+        photo_labels = [
+            "Front Left Tire", "Front Right Tire",
+            "Rear Left Tire", "Rear Right Tire",
+            "Front Bumper", "Rear Bumper",
+            "Driver Side Panel", "Passenger Side Panel"
+        ]
+        
+        uploaded_files = []
+        # Render 8 uploaders in a 2-column grid
+        for i in range(0, 8, 2):
+            c1, c2 = st.columns(2)
+            with c1:
+                f1 = st.file_uploader(photo_labels[i], type=["jpg", "jpeg", "png", "heic"], key=f"photo_{i}")
+                if f1: uploaded_files.append(f1)
+            with c2:
+                f2 = st.file_uploader(photo_labels[i+1], type=["jpg", "jpeg", "png", "heic"], key=f"photo_{i+1}")
+                if f2: uploaded_files.append(f2)
         
         submitted = st.form_submit_button("Submit Audit", use_container_width=True, type="primary")
         
